@@ -1,0 +1,170 @@
+---
+preview: ![](https://scotch.io/wp-content/uploads/2017/03/taD2RtmxSJWvYEKNljDB_Group203.png.jpg)
+By now, most probably, we have come in peace with the fact that Angular will be rolling out features using semantic versioning. This means we've got to worry less about nor entirely new concept (at least for now).
+title: 5 Features To Watch Out For in Angular v4
+tags: JavaScript, Angular
+author: Acid-base
+date: 2017-03-20 20:53:00
+---
+Angular skipped version 3 to v4 so as to sync all the different modules. The sync was broken when the Router module was already at v3, and the other modules with no API breaking changes were still at v2. Jacky Kimani announced v4 here at Scotch and highlighted some important points worth noting about this version.
+
+With v4 in RC, there are awesome features that are worth your time. They include but not all:
+
+1. if...else syntax in component HTML templates
+2. Stand alone animation module
+3. TypeScript's StrictNullChecks compliancy
+4. Angular Universal adoption by team to live in core
+5. Performance boost with FESM
+
+# Installation
+
+Angular v4 is in RC; this means you can start using it in your project hoping that no breaking changes will be released at final. To install, run the following command:
+
+npm install @angular/{common,compiler,compiler-cli,core,forms,http,platform-browser,platform-browser-dynamic,platform-server,router,animations}@next --save
+The installation requires an update to TypeScript.
+
+# 1. If...Else Template Conditions
+
+Angular 2.x has a *ngIf template literal used for making decision based on some JavaScript-like expression:
+
+<p *ngIf="isAuth">You are logged in as auth.username</p>
+What if the user is not logged in or we are waiting for the user login request to complete before displaying a message? With Angular v4 (RC), you can use the else syntax to handle such case:
+
+Syntax:
+
+<element *ngIf="[condition expression]; else [else template]">
+
+</element>
+Example:
+
+<ng-template #hidden>
+  <p>You are not allowed to see our secret</p>
+</ng-template>
+<p *ngIf="shown; else hidden">
+  Our secret is being happy
+</p>
+export class AppComponent implements OnInit {
+  shown: Boolean;
+  auth: Observable<{}>;
+
+  ngOnInit() {
+    this.shown = false;
+  }
+}
+DOM Output:
+
+<!-- Condition is falsy. This is what we see -->
+<p>
+You are not allowed to see our secret
+</p>
+SHOWING LOADING INFO
+
+Let's have a look at a possibly realistic example:
+
+export class AppComponent implements OnInit{
+  auth: Observable<{}>;
+
+  ngOnInit() {
+    this.shown = true;
+    this.auth = Observable
+      .of({username: 'chris', password: 'me@chris.me'})
+      .delay(new Date(Date.now() + 4000));
+  }
+}
+We are simulating an HTTP async request with Observable that returns a user payload if successful. The request simulation will take 4 seconds so we can use the else syntax to display a loading message while it waits:
+
+<ng-template #fetching>
+  <p>Fetching...</p>
+</ng-template>
+<p *ngIf="auth | async; else fetching; let user">
+  {{user.username }}
+</p>
+# 2. Animation Module
+
+Animation has been around since Angular 2 but was maintained under @angular/core. So if you wanted to use the animation features, your import would look like this:
+
+import { 
+  Component, 
+  OnInit
+  // Animation members
+  animate, 
+  state, 
+  style, 
+  transition, 
+  trigger } from '@angular/core'
+Angular will no longer allow you to do that, rather, you should import those animation members from @angular/animations:
+
+import {Component, OnInit} from '@angular/core';
+
+import {
+  animate, 
+  state, 
+  style, 
+  transition, 
+  trigger } from '@angular/animations'
+# 3. TypeScript's StrictNullChecks
+
+Originally, null and undefined are JavaScript valid first class type citizens. TypeScript before now didn't adhere to that, which means you can't define a variable and tell TypeScript that this variable's value can be null or undefined.
+
+Now, TypeScript allows you to explicitly say a variable can have any of those types:
+
+let x = String | null
+let y = Number | undefined
+let z = Array<String> | null | undefined
+The above example simple says:
+
+x can have a value of type String or a null value
+y can have a value of type Number or can be undefined
+z can have a value of type Arrays with String members, can be a null or can be undefined
+This feature is now compliant in Angular (v4), so you could do stuff like this:
+
+export class AppComponent implements OnInit{
+
+  canBeNull: String | null;
+  canBeUndefined: Number | undefined;
+  canBeNullOrUndefined: String | null | undefined;
+
+  ngOnInit() {
+    this.canBeNull = null;
+    console.log(this.canBeNull); // null
+
+    this.canBeUndefined = undefined;
+    console.log(this.canBeUndefined); // undefined
+
+    this.canBeNullOrUndefined = null;
+    console.log(this.canBeNullOrUndefined); //null
+    this.canBeNullOrUndefined = undefined;
+    console.log(this.canBeNullOrUndefined); // undefined
+  }
+}
+# 4. Angular Universal
+
+Server-side rendering is the act of spitting the same HTML content in virtual DOM to the server so that they are rendered appropriately by the browser on request. This allows spiders and web robots to dig your websites and index contents when necessary.
+
+Server-side rendering was not a thing in canonical web development until single page apps came about. Such apps use a virtual DOM concept which abstracts DOM rendering. A technique is needed to render to DOM via server requests, and Angular has a solution called Angular Universal which we have previously talked about.
+
+The project was maintained entirely outside Angular, but from Angular v4 forward, Universal will become a core Angular module. Henceforth, you can easily do this:
+
+import { platformServer, renderModuleFactory } from '@angular/platform-server'
+Rob's example is a perfect and easy place to see how the integration works out.
+
+# 5. FESM
+
+Meaning: Flattened ECMAScript Module
+
+This is a very important update that you will likely never notice. Angular v4 ships flattened versions of modules in the ECMAScript Module format. Quoting the changelog:
+
+This format should help tree-shaking, help reduce the size of your generated bundles, and speed up build, transpilation, and loading in the browser in certain scenarios.
+This implies that there will be a noticeable impact on performance. Judging from my test, the build speed when running ng server has increased drastically.
+
+# Conclusion
+
+A few things to watch out for:
+
+Updating to Angular v4 could mean that some of the dependent modules will be out of sync, so you have to update them as well. Personally, the only issue I had was TypeScript which I updated to 2.2.1.
+Code editors and plugins that understand the Angular template syntax will still complain about improper syntax when you use the else keyword. This is fine because your code will still work. The plugin/editor managers will make updates as soon as they can.
+With all these information, feel free to start experimenting this shiny version. It would also be nice to help the team and community by filing issues if you come across a weird behavior from setting up to usage. You can also read about other features and bug fixes if you think it's necessary.
+
+Chris Nwamba
+JavaScript Preacher. Building the web with the JS community.
+https://scotch.io/tutorials/5-features-to-watch-out-for-in-angular-4

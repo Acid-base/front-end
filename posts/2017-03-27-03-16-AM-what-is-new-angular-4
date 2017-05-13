@@ -1,0 +1,150 @@
+---
+preview: ![](http://blog.ninja-squad.com/assets/images/angular.png)
+Technically there are some breaking changes, explaining that’s why the major version number has changed. And, if you missed it, there is no Angular 3: the router package was in version 3.x, so instead of bumping everything to 3.0 and the router to 4.0, the team chose to bump everything to 4.0.
+title: What's new in Angular 4?
+tags: JavaScript, Angular
+author: Acid-base
+date: 2017-03-27 06:14:00
+---
+## Templates
+#### template is now ng-template
+The template tag is now deprecated: you should use the ng-template tag instead. It still works though. It was a bit confusing as template is a real HTML tag that Web Component can use. Now Angular has its own template tag: ng-template. You will have a warning if you use the deprecated template somewhere when you update to Angular 4, so it will be easy to spot them.
+
+#### ngIf with else
+It’s now also possible to use an else syntax in your templates:
+
+```
+<div *ngIf="races.length > 0; else empty"><h2>Races</h2></div>
+<ng-template #empty><h2>No races.</h2></ng-template>
+```
+#### as
+Another addition to the template syntax is the as keyword, to simplify the let syntax. It allows to store a result in a variable of the template, to use it in the element.
+
+It can be useful to store a sliced collection for example:
+
+```
+<div *ngFor="let pony of ponies | slice:0:2 as total; index as = i">
+  {{i+1}}/{{total.length}}: {{pony.name}}
+</div>
+```
+Or even more useful, to subscribe only once to a pipe with async. If race is an observable, instead of the bad and ugly:
+
+```
+<div>
+  <h2>{{ (race | async)?.name }}</h2>
+  <small>{{ (race | async)?.date }}</small>
+</div>
+```
+you can now use the good:
+
+```
+<div *ngIf="race | async as raceModel">
+  <h2>{{ raceModel.name }}</h2>
+  <small>{{ raceModel.date }}</small>
+</div>
+```
+## Pipes
+Titlecase
+Angular 4 introduced a new titlecase pipe. It changes the first letter of each word into uppercase:
+
+```
+<p>{{ 'ninja squad' | titlecase }}</p>
+<!-- will display 'Ninja Squad' -->
+```
+## Http
+Adding search parameters to an HTTP request has been simplified:
+
+```
+http.get(`${baseUrl}/api/races`, { params: { sort: 'ascending' } });
+```
+Previously, you had to do:
+
+```
+const params= new URLSearchParams();
+params.append('sort', 'ascending');
+http.get(`${baseUrl}/api/races`, { search: params });
+```
+## Test
+Overriding a template in a test has also been simplified:
+
+```
+TestBed.overrideTemplate(RaceComponent, '<h2>{{race.name}}</h2>');
+```
+Previously, you had to do:
+
+```
+TestBed.overrideComponent(RaceComponent, {
+  set: { template: '<h2>{{race.name}}</h2>' }
+});
+```
+## Service
+#### Meta
+A new service has been introduced to easily get or update meta tags:
+
+```
+@Component({
+  selector: 'ponyracer-app',
+  template: `<h1>PonyRacer</h1>`
+})
+export class PonyRacerAppComponent {
+
+  constructor(meta: Meta) {
+    meta.addTag({ name: 'author', content: 'Ninja Squad' });
+  }
+
+}
+```
+## Forms
+#### Validators
+One new validator joins the existing required, minLength, maxLength and pattern. email helps you validate that the input is a valid email (good luck finding the correct regular expression by yourself).
+
+Compare select options
+A new directive has been added to help you compare options from a select: compareWith.
+
+```
+<select [compareWith]="byId" [(ngModel)]="selectedPony">
+   <option *ngFor="let pony of race.ponies" [ngValue]="pony">{{pony.name}}</option>
+</select>
+
+byId(p1: PonyModel, p2: PonyModel) {
+   return p1.id === p2.id;
+}
+```
+## Router
+#### ParamMap
+A new interface has been introduced to represent the parameters of a URL: ParamMap. Instead of using params or queryParams, you should now use paramMap or queryParamMap, because they offer the choice between get() to get a value, or getAll() to get all values (as query parameters can have multiple values for example).
+
+```
+const id = this.route.snapshot.paramMap.get('ponyId');
+this.ponyService.get(id).subscribe(pony => this.pony = pony);
+```
+or as an Observable:
+
+```
+this.route.paramMap
+  .map((params: ParamMap) => params.get('ponyId'))
+  .switchMap(id => this.ponyService.get(id))
+  .subscribe(pony => this.pony = pony);
+```
+## CanDeactivate
+The CanDeactivate interface now has an extra (optional) parameter, containing the next state (where you are going to navigate). You can now implement clever logic when your user navigates away from the current component, depending on where he/she is going.
+
+## I18n
+The internationalization is slowly improving with tiny things. For example, ngPlural is now simpler:
+
+```
+<div [ngPlural]="value">
+  <ng-template ngPluralCase="0">there is nothing</ng-template>
+  <ng-template ngPluralCase="1">there is one</ng-template>
+</div>
+```
+compared to what we had to write:
+
+```
+<div [ngPlural]="value">
+  <ng-template ngPluralCase="=0">there is nothing</ng-template>
+  <ng-template ngPluralCase="=1">there is one</ng-template>
+</div>
+```
+
+http://blog.ninja-squad.com/2017/03/24/what-is-new-angular-4/

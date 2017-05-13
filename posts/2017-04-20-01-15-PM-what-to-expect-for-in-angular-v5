@@ -1,0 +1,43 @@
+---
+preview: ![](https://cdn-images-1.medium.com/max/800/1*Tp8yS64AlokSmb6ygIWsUQ.png)
+While we are busy learning and exploring Angular v4, the Angular’s team is looking forward and planning the fifth version of our lovely Angular platform. In the last week, the main Angular conference, ng-conf 2017, took place in Utah and it was amazing. “You can build with us!” is the Angular team’s overall message to the developer community this year 😍
+title: What to Expect for in Angular v5?
+tags: Angular
+author: Acid-base
+date: 17-04-20 16:14
+---
+The Angular’s team always thinking what they need to do in the next version, what’s going to push Angular in the right direction and what’s going to make a difference.
+In this article we will get a taste from version 5.
+Make AOT the default
+One of the Angular’s team goals is to simplify the way we compile the application. It’s very common that in the development mode we use what we call Just-In-Time (JIT) compilation. JIT is a very fast compilation process that helps with enabling the fast development lifecycle. Then, when you’re ready to go to production, use the optimizing compiler that we call the Ahead-Of-Time (AOT) compiler. Sometimes, there are differences between this two, which can be frustrating, because you work on an application and when you’re ready to ship you realize that there are things that you still need to do before you can actually build up an application and push it to production.
+The team is going to make the AOT compilation the default. It will be done by making it much faster and by enabling incremental compilation. This means that we will have a single compilation process that we will use throughout the whole application development. The process will reduce the number of the friction in the development. Another thing is focusing on size and speed. We have heard a lot about the “60% reduction of bundle size or the application size across the board”. This was a good achievement but the team realized that they can still do much more.
+Watch mode
+As we can run tsc —-watch, we want to have the same for the Angular's compiler (ngc) and integrate it with angular-cli. We want to realize as soon as possible if our code is good or not.
+
+Time is money
+Type checking in templates
+Another thing they will actually work on is the type checking in templates. If we used ahead of time compilation and we misspelled the property, then there will be a type check error in our *.ngfactory files. For someone who is not an expert this doesn’t tell anything, because when looking at these *.ngfactory files we don’t know what Angular does under the hood. So, the team will change this to be a type checker that will report regarding our template, so it will say “ line: 2, column: 3 you made a mistake in property x” and it will work, also, with Typescript strict-null-checks.
+More flexible metadata
+AOT only allows top level functions as factories in the useFactory property, so when we build a provider object, we cannot use a closure. This will be supported in the future.
+Remove *.ngfactory.ts files
+Angular’s offline compiler compiles templates into Typescript files with .ngfactory.ts extension. The Typescript compiler compiles the this files into JavaScript. So, it (type-)checks and detects typo and type errors in our templates if any. The team will change the compiled pipeline to inline the *.ngfactory into our code, while we compile it.
+Better error messages
+Version 4 brings us huge improvements in the error messages, but it is still not perfect. The team have worked on better error messages in terms of amount, quality and more details.
+Smooth upgrades
+Smooth upgrades, just like with version 4, are amazing. They want to make it super easy for us to jump on and use it. It can be done only by making sure that there are no obstacles and that there is no reason to stick to version 4 or 5. Does it sounds like automatic upgrade? 😱
+
+Smooth upgrade
+Tree-Shakeable components
+A tree shaker walks the dependency graph, top to bottom, and shakes out unused code like dead leaves in a tree. Tree shaking can greatly reduce the downloaded size of the application by removing unused portions of both source and library code. Another thing the team will be focusing on is making sure that, when we are using component libraries, like angular-material, ionic or material design, we will be able to tree shake all the components.
+Hybrid Upgrade Application
+Google invests big resources in the field of upgrading application. It is inevitable to supply an upgrade path to the developers that don’t start from zero and coming to Angular with AngularJS-based application. The team doesn’t stop and will continue working on helping these developers to stay in front and enjoy new features. Version 5 will bring us the following improvements.
+Lazy loading for AngularJS/Angular
+Less boilerplate and better tooling
+Improve the performance of hybrid applications
+Better dual-router
+Improve the testing
+More documentation and examples
+Conclusion
+The v5 is still far away but some of its benefits are already visible. Big things will do in the angular compiler and the hybrid upgrade application. It’s still not locked and some changes in the plans probably will be done. It appears that there is a lot of work for the core team and, in the meantime, we can continue enjoying v4. So, September-October 2017 gonna be interesting 😁
+
+https://hackernoon.com/what-to-expect-for-in-angular-v5-6e0fc9c4b13e
